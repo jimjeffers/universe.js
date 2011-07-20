@@ -1,3 +1,3 @@
-# Universe.coffee
+# universe.js
 
-Ported [Andrew Ryno](https://github.com/andrewryno)'s [universe.js](https://github.com/andrewryno/universe.js) physics engine to coffee script.
+Physics engine for Javascript built using CoffeeScript. Currently in progress and not ready for use. Documentation to come once it's further along. Feel free to contribute!
