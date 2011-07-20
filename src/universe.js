@@ -16,6 +16,9 @@
     };
     function Universe(params) {
       var universeObject, _i, _len, _ref;
+      if (params == null) {
+        params = {};
+      }
       this.framerate = params.framerate || 100;
       this.gravity = params.gravity || -10;
       this.scale = params.scale || 40;
@@ -80,6 +83,9 @@
   })();
   this.UniverseObject = (function() {
     function UniverseObject(params) {
+      if (params == null) {
+        params = {};
+      }
       this.element = params.element || null;
       this.mass = params.mass || 10;
       this.width = params.width || 16;

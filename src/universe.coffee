@@ -7,7 +7,7 @@ class @Universe
     x: 0
     y: 0
   
-  constructor: (params) ->
+  constructor: (params={}) ->
     @framerate        = params.framerate    ||  100
     @gravity          = params.gravity      || -10              # meters per second per second
     @scale            = params.scale        ||  40              # pixels per meter
@@ -60,7 +60,7 @@ class @UniverseTimer
     @count++
   
 class @UniverseObject
-  constructor: (params) ->
+  constructor: (params={}) ->
     @element        = params.element          ||  null
     @mass           = params.mass             ||  10
     @width          = params.width            ||  16
