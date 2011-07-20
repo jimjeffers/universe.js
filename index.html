@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 	<title>Universe</title>
 	<link rel="stylesheet" href="style.css" type="text/css">
-	<script src="universe.js"></script>
+	<script src="coffee_universe.js"></script>
 </head>
 <body>
 	<div id="world">
@@ -12,7 +12,7 @@
 		<div id="square"></div>
 	</div>
 	<script>
-	var test_world = Universe.init({
+	var test_world = new Universe({
 		gravity: -10,
 		world: document.getElementById('world'),
 		vacuum: false
@@ -21,16 +21,17 @@
 	var circle = new UniverseObject({
 		element: document.getElementById('circle'),
 		position: {x: 50, y: 50, z: 0},
-		velocity: {x: 5, y: 5, z: 0},
-		world: test_world
+		velocity: {x: 5, y: -5, z: 0}
 	});
 	
 	var square = new UniverseObject({
 		element: document.getElementById('square'),
 		position: {x: 750, y: 50, z: 0},
-		velocity: {x: -5, y: 1, z: 0},
-		world: test_world
+		velocity: {x: -5, y: -1, z: 0}
 	});
+	
+	test_world.addObject(square);
+	test_world.addObject(circle);
 	</script>
 </body>
 </html>
