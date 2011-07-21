@@ -39,9 +39,11 @@ class @Universe
       
       object.x(object.x() + object.velocity.x * @time.dt)           # x = x_old + dx
       object.y(object.y() + object.velocity.y * @time.dt)           # y = y_old + dy
+      object.z(object.z() + object.velocity.z * @time.dt)           # z = z_old + dz
       
       object.element.style.left = "#{object.position.x*@scale}px"
       object.element.style.top  = "#{object.position.y*@scale}px"
+      # TODO: scale object for z-axis movement
       
 class @UniverseTimer
   constructor: (@universe) ->
@@ -97,3 +99,8 @@ class @UniverseObject
     if y?
       @position.y = @_world.clientHeight - y
     @_world.clientHeight - @position.y
+  
+  z: (z) ->
+    if z?
+      @position.z = z
+    @position.z
