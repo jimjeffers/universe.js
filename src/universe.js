@@ -32,7 +32,6 @@ this.Universe = (function() {
       }
     }
     this.time = new UniverseTimer(this);
-    this.run();
   }
   Universe.prototype.run = function() {
     this.moveObjects();
@@ -103,6 +102,11 @@ this.UniverseObject = (function() {
       this.element.setAttribute('class', this.type);
       this.universe.space.appendChild(this.element);
     }
+    if (this.element.style.position !== 'absolute') {
+      this.element.style.position = 'absolute';
+    }
+    this.element.style.left = "" + (this.x(this.position.x)) + "px";
+    this.element.style.top = "" + (this.y()) + "px";
     this.universe.addObject(this);
   }
   UniverseObject.prototype.useScale = function(scale) {
@@ -126,8 +130,10 @@ this.UniverseObject = (function() {
   UniverseObject.prototype.y = function(y) {
     if (y != null) {
       this.position.y = this.universe.space.clientHeight - y;
+    } else {
+      this.position.y = this.universe.space.clientHeight - this.position.y;
     }
-    return this.universe.space.clientHeight - this.position.y;
+    return this.position.y;
   };
   UniverseObject.prototype.z = function(z) {
     if (z != null) {

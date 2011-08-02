@@ -5,12 +5,13 @@
 
 body {
 	background: #ccc;
+	text-align: center;
 }
 
 #space {
 	background: #fff;
 	border: 3px solid #333;
-	margin: 50px auto 0 auto;
+	margin: 50px auto 20px auto;
 	overflow: hidden;
 	position: relative;
 	width: 960px;
@@ -18,24 +19,20 @@ body {
 }
 
 .circle {
-	background: #000;
+	background: blue;
 	-moz-border-radius: 15px;
 	-webkit-border-radius: 15px;
 	border-radius: 15px;
-	position: absolute;
-	top: 50px;
-	left: 50%;
-	margin-left: -15px;
 	width: 30px;
 	height: 30px;
 }
 
 .square {
-	background: #000;
-	position: absolute;
-	top: 50px;
-	left: 50%;
-	margin-left: -15px;
+	background: red;
 	width: 30px;
 	height: 30px;
+}
+
+#start {
+	font-size: 18px;
 }

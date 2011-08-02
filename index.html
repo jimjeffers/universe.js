@@ -11,31 +11,33 @@
 		<div id="circle-existing" class="circle"></div>
 		<div id="square-existing" class="square"></div>
 	</div>
+	<input type="button" name="start" value="Start" id="start" onclick="test_universe.run()">
 	<script>
 	var test_universe = new Universe({
 		gravity: -10,
+		scale: 5,
 		space: document.getElementById('space'),
 		vacuum: false
 	});
 	
 	var new_object = new UniverseObject({
 		type: 'circle',
-		position: {x: 400, y: 50, z: 0},
+		position: {x: 400, y: 300, z: 0},
 		acceleration: {x: -5, y: 5, z: 0},
 		universe: test_universe
 	});
 	
 	var circle = new UniverseObject({
 		element: document.getElementById('circle-existing'),
-		position: {x: 50, y: 50, z: 0},
-		velocity: {x: 20, y: 10, z: 0},
+		position: {x: 500, y: 300, z: 0},
+		velocity: {x: 0, y: 10, z: 0},
 		universe: test_universe
 	});
 	
 	var square = new UniverseObject({
 		element: document.getElementById('square-existing'),
-		position: {x: 894, y: 50, z: 0},
-		velocity: {x: -5, y: -5, z: 0},
+		position: {x: 894, y: 300, z: 0},
+		velocity: {x: -20, y: 20, z: 0},
 		universe: test_universe
 	});
 	</script>

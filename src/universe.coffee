@@ -22,8 +22,7 @@ class @Universe
 				@addObject(universeObject)
 		
 		@time = new UniverseTimer(this)
-		@run()
-		
+	
 	run: ->
 		@moveObjects()
 		@time.advance()
@@ -84,6 +83,12 @@ class @UniverseObject
 			@element.setAttribute('class', @type)
 			@universe.space.appendChild(@element)
 		
+		if @element.style.position isnt 'absolute'
+			@element.style.position = 'absolute'
+		
+		@element.style.left = "#{@x(@position.x)}px"
+		@element.style.top	= "#{@y()}px"
+		
 		@universe.addObject(this)
 	
 	# Apply universe scale to position.
@@ -102,7 +107,9 @@ class @UniverseObject
 	y: (y) ->
 		if y?
 			@position.y = @universe.space.clientHeight - y
-		@universe.space.clientHeight - @position.y
+		else
+			@position.y = @universe.space.clientHeight - @position.y
+		@position.y
 	
 	z: (z) ->
 		if z?
