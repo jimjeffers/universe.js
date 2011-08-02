@@ -37,9 +37,24 @@ this.Universe = (function() {
     this.moveObjects();
     return this.time.advance();
   };
+  Universe.prototype.stop = function() {
+    return this.time.stop();
+  };
+  Universe.prototype.reset = function() {
+    var object, _i, _len, _ref, _results;
+    this.time.stop();
+    _ref = this.objects;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      object = _ref[_i];
+      object.element.style.left = "" + (object.x(object.originalPosition.x) * this.scale) + "px";
+      object.element.style.top = "" + (object.y(object.originalPosition.y) * this.scale) + "px";
+      object.acceleration = object.clone(object.originalAcceleration);
+      _results.push(object.velocity = object.clone(object.originalVelocity));
+    }
+    return _results;
+  };
   Universe.prototype.addObject = function(universeObject) {
-    universeObject.useScale(this.scale);
-    universeObject.acceleration.y += this.gravity;
     return this.objects.push(universeObject);
   };
   Universe.prototype.moveObjects = function() {
@@ -70,7 +85,7 @@ this.UniverseTimer = (function() {
   }
   UniverseTimer.prototype.advance = function() {
     var currentTime;
-    setTimeout((__bind(function() {
+    this.timer = setTimeout((__bind(function() {
       return this.universe.run();
     }, this)), 1000 / this.universe.framerate);
     currentTime = new Date().getTime() / 1000;
@@ -79,6 +94,12 @@ this.UniverseTimer = (function() {
     }
     this.last = currentTime;
     return this.count++;
+  };
+  UniverseTimer.prototype.stop = function() {
+    this.dt = 0;
+    this.count = 0;
+    this.last = 0;
+    return clearTimeout(this.timer);
   };
   return UniverseTimer;
 })();
@@ -97,6 +118,10 @@ this.UniverseObject = (function() {
     this.acceleration = params.acceleration || Universe.create3DVector();
     this.universe = params.universe || null;
     this._scale = null;
+    this.acceleration.y += this.universe.gravity;
+    this.originalPosition = this.clone(this.position);
+    this.originalVelocity = this.clone(this.velocity);
+    this.originalAcceleration = this.clone(this.acceleration);
     if (this.element === null && this.type !== null) {
       this.element = document.createElement('div');
       this.element.setAttribute('class', this.type);
@@ -105,22 +130,10 @@ this.UniverseObject = (function() {
     if (this.element.style.position !== 'absolute') {
       this.element.style.position = 'absolute';
     }
-    this.element.style.left = "" + (this.x(this.position.x)) + "px";
-    this.element.style.top = "" + (this.y()) + "px";
+    this.element.style.left = "" + (this.x(this.originalPosition.x) * this.universe.scale) + "px";
+    this.element.style.top = "" + (this.y(this.originalPosition.y) * this.universe.scale) + "px";
     this.universe.addObject(this);
   }
-  UniverseObject.prototype.useScale = function(scale) {
-    var dimension, value, _ref;
-    if (scale !== this._scale) {
-      this._scale = scale;
-      _ref = this.position;
-      for (dimension in _ref) {
-        value = _ref[dimension];
-        this.position[dimension] = value / this._scale;
-      }
-    }
-    return this;
-  };
   UniverseObject.prototype.x = function(x) {
     if (x != null) {
       this.position.x = x;
@@ -129,17 +142,26 @@ this.UniverseObject = (function() {
   };
   UniverseObject.prototype.y = function(y) {
     if (y != null) {
-      this.position.y = this.universe.space.clientHeight - y;
-    } else {
-      this.position.y = this.universe.space.clientHeight - this.position.y;
+      return this.position.y = (this.universe.space.clientHeight / this.universe.scale) - y;
     }
-    return this.position.y;
+    return (this.universe.space.clientHeight / this.universe.scale) - this.position.y;
   };
   UniverseObject.prototype.z = function(z) {
     if (z != null) {
       this.position.z = z;
     }
     return this.position.z;
+  };
+  UniverseObject.prototype.clone = function(obj) {
+    var key, newInstance;
+    if (!(obj != null) || typeof obj !== 'object') {
+      return obj;
+    }
+    newInstance = new obj.constructor();
+    for (key in obj) {
+      newInstance[key] = this.clone(obj[key]);
+    }
+    return newInstance;
   };
   return UniverseObject;
 })();

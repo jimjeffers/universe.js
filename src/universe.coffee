@@ -27,9 +27,18 @@ class @Universe
 		@moveObjects()
 		@time.advance()
 	
+	stop: ->
+		@time.stop()
+	
+	reset: ->
+		@time.stop()
+		for object in @objects
+			object.element.style.left = "#{object.x(object.originalPosition.x)*@scale}px"
+			object.element.style.top = "#{object.y(object.originalPosition.y)*@scale}px"
+			object.acceleration = object.clone(object.originalAcceleration)
+			object.velocity = object.clone(object.originalVelocity)
+	
 	addObject: (universeObject) ->
-		universeObject.useScale(@scale)
-		universeObject.acceleration.y += @gravity
 		@objects.push(universeObject)
 	
 	moveObjects: ->
@@ -43,7 +52,7 @@ class @Universe
 			object.z(object.z() + object.velocity.z * @time.dt)		# z = z_old + dz
 			
 			object.element.style.left = "#{object.position.x*@scale}px"
-			object.element.style.top	= "#{object.position.y*@scale}px"
+			object.element.style.top = "#{object.position.y*@scale}px"
 			# TODO: scale object for z-axis movement
 			
 class @UniverseTimer
@@ -53,14 +62,20 @@ class @UniverseTimer
 		@last	= 0
 	
 	advance: ->
-		setTimeout(( => # Fat arrow binds 'this' to the current Universe object to the function called by setTimeout 
+		@timer = setTimeout(( => # Fat arrow binds 'this' to the current Universe object to the function called by setTimeout 
 			@universe.run()
-		),1000/@universe.framerate)
+		), 1000/@universe.framerate)
 		currentTime = new Date().getTime() / 1000 # current time in seconds.
 		if @count > 0
 			@dt = currentTime - @last
 		@last = currentTime
 		@count++
+	
+	stop: ->
+		@dt = 0
+		@count = 0
+		@last = 0
+		clearTimeout(@timer)
 	
 class @UniverseObject
 	constructor: (params={}) ->
@@ -75,8 +90,17 @@ class @UniverseObject
 		@universe		= params.universe		|| null
 		
 		# Private Vars
-		@_scale	= null
+		@_scale = null
 		
+		# Add acceleration
+		@acceleration.y += @universe.gravity
+		
+		# Keep original values for reset
+		@originalPosition = @clone(@position)
+		@originalVelocity = @clone(@velocity)
+		@originalAcceleration = @clone(@acceleration)
+		
+		# Create element if not supplied
 		if @element is null and @type isnt null
 			@element = document.createElement('div')
 			# for now, set a class to the element until automatic styling
@@ -86,18 +110,10 @@ class @UniverseObject
 		if @element.style.position isnt 'absolute'
 			@element.style.position = 'absolute'
 		
-		@element.style.left = "#{@x(@position.x)}px"
-		@element.style.top	= "#{@y()}px"
+		@element.style.left = "#{@x(@originalPosition.x)*@universe.scale}px"
+		@element.style.top = "#{@y(@originalPosition.y)*@universe.scale}px"
 		
 		@universe.addObject(this)
-	
-	# Apply universe scale to position.
-	useScale: (scale) ->
-		if scale != @_scale
-			@_scale = scale
-			for dimension,value of @position
-				@position[dimension] = value / @_scale
-		this
 	
 	x: (x) ->
 		if x?
@@ -106,12 +122,22 @@ class @UniverseObject
 	
 	y: (y) ->
 		if y?
-			@position.y = @universe.space.clientHeight - y
-		else
-			@position.y = @universe.space.clientHeight - @position.y
-		@position.y
+			return @position.y = (@universe.space.clientHeight/@universe.scale) - y
+		
+		(@universe.space.clientHeight/@universe.scale) - @position.y
 	
 	z: (z) ->
 		if z?
 			@position.z = z
 		@position.z
+	
+	clone: (obj) ->
+		if not obj? or typeof obj isnt 'object'
+			return obj
+		
+		newInstance = new obj.constructor()
+		
+		for key of obj
+			newInstance[key] = @clone obj[key]
+		
+		return newInstance
