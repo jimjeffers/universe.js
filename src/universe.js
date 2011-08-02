@@ -20,9 +20,9 @@ this.Universe = (function() {
     }
     this.framerate = params.framerate || 100;
     this.gravity = params.gravity || -10;
-    this.scale = params.scale || 40;
+    this.scale = params.scale || 10;
     this.vacuum = params.vacuum || false;
-    this.world = params.world || null;
+    this.space = params.space || null;
     this.objects = [];
     if ((params.objects != null) && params.objects.length > 0) {
       _ref = params.objects;
@@ -39,7 +39,8 @@ this.Universe = (function() {
     return this.time.advance();
   };
   Universe.prototype.addObject = function(universeObject) {
-    universeObject.useScale(this.scale).useWorld(this.world);
+    universeObject.useScale(this.scale);
+    universeObject.acceleration.y += this.gravity;
     return this.objects.push(universeObject);
   };
   Universe.prototype.moveObjects = function() {
@@ -48,8 +49,9 @@ this.Universe = (function() {
     _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       object = _ref[_i];
-      object.acceleration.y = this.gravity;
+      object.velocity.x += object.acceleration.x * this.time.dt;
       object.velocity.y += object.acceleration.y * this.time.dt;
+      object.velocity.z += object.acceleration.z * this.time.dt;
       object.x(object.x() + object.velocity.x * this.time.dt);
       object.y(object.y() + object.velocity.y * this.time.dt);
       object.z(object.z() + object.velocity.z * this.time.dt);
@@ -87,18 +89,22 @@ this.UniverseObject = (function() {
       params = {};
     }
     this.element = params.element || null;
-    this.mass = params.mass || 10;
-    this.width = params.width || 16;
-    this.height = params.height || 16;
+    this.type = params.type || null;
+    this.mass = params.mass || null;
+    this.width = params.width || null;
+    this.height = params.height || null;
     this.position = params.position || Universe.create3DVector();
     this.velocity = params.velocity || Universe.create3DVector();
     this.acceleration = params.acceleration || Universe.create3DVector();
+    this.universe = params.universe || null;
     this._scale = null;
-    this._world = null;
+    if (this.element === null && this.type !== null) {
+      this.element = document.createElement('div');
+      this.element.setAttribute('class', this.type);
+      this.universe.space.appendChild(this.element);
+    }
+    this.universe.addObject(this);
   }
-  UniverseObject.prototype.belongsToUniverse = function() {
-    return this._universe != null;
-  };
   UniverseObject.prototype.useScale = function(scale) {
     var dimension, value, _ref;
     if (scale !== this._scale) {
@@ -111,10 +117,6 @@ this.UniverseObject = (function() {
     }
     return this;
   };
-  UniverseObject.prototype.useWorld = function(world) {
-    this._world = world;
-    return this;
-  };
   UniverseObject.prototype.x = function(x) {
     if (x != null) {
       this.position.x = x;
@@ -123,9 +125,9 @@ this.UniverseObject = (function() {
   };
   UniverseObject.prototype.y = function(y) {
     if (y != null) {
-      this.position.y = this._world.clientHeight - y;
+      this.position.y = this.universe.space.clientHeight - y;
     }
-    return this._world.clientHeight - this.position.y;
+    return this.universe.space.clientHeight - this.position.y;
   };
   UniverseObject.prototype.z = function(z) {
     if (z != null) {

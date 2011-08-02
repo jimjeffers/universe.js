@@ -7,7 +7,7 @@ body {
 	background: #ccc;
 }
 
-#world {
+#space {
 	background: #fff;
 	border: 3px solid #333;
 	margin: 50px auto 0 auto;
@@ -17,7 +17,7 @@ body {
 	height: 500px;
 }
 
-#circle {
+.circle {
 	background: #000;
 	-moz-border-radius: 15px;
 	-webkit-border-radius: 15px;
@@ -30,7 +30,7 @@ body {
 	height: 30px;
 }
 
-#square {
+.square {
 	background: #000;
 	position: absolute;
 	top: 50px;

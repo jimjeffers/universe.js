@@ -10,9 +10,9 @@ class @Universe
 	constructor: (params={}) ->
 		@framerate	= params.framerate	||	100		# frames per second
 		@gravity	= params.gravity	|| -10		# meters per second per second
-		@scale		= params.scale		||	40		# pixels per meter
+		@scale		= params.scale		||	10		# pixels per meter
 		@vacuum		= params.vacuum		||	false	# TODO: air resistance
-		@world		= params.world		||	null	# Find a default world.
+		@space		= params.space		||	null	# Find space.
 		@objects	= []
 		
 		# If user supplied an objects array on init we'll
@@ -29,17 +29,19 @@ class @Universe
 		@time.advance()
 	
 	addObject: (universeObject) ->
-		universeObject.useScale(@scale).useWorld(@world)
+		universeObject.useScale(@scale)
+		universeObject.acceleration.y += @gravity
 		@objects.push(universeObject)
 	
 	moveObjects: ->
 		for object in @objects
-			object.acceleration.y = @gravity
-			object.velocity.y			+= object.acceleration.y * @time.dt			# v = a * dt
+			object.velocity.x += object.acceleration.x * @time.dt	# v = a * dt
+			object.velocity.y += object.acceleration.y * @time.dt	# v = a * dt
+			object.velocity.z += object.acceleration.z * @time.dt	# v = a * dt
 			
-			object.x(object.x() + object.velocity.x * @time.dt)						# x = x_old + dx
-			object.y(object.y() + object.velocity.y * @time.dt)						# y = y_old + dy
-			object.z(object.z() + object.velocity.z * @time.dt)						# z = z_old + dz
+			object.x(object.x() + object.velocity.x * @time.dt)		# x = x_old + dx
+			object.y(object.y() + object.velocity.y * @time.dt)		# y = y_old + dy
+			object.z(object.z() + object.velocity.z * @time.dt)		# z = z_old + dz
 			
 			object.element.style.left = "#{object.position.x*@scale}px"
 			object.element.style.top	= "#{object.position.y*@scale}px"
@@ -47,9 +49,9 @@ class @Universe
 			
 class @UniverseTimer
 	constructor: (@universe) ->
-		@count		= 0
-		@dt				= 0
-		@last			= 0
+		@count	= 0
+		@dt		= 0
+		@last	= 0
 	
 	advance: ->
 		setTimeout(( => # Fat arrow binds 'this' to the current Universe object to the function called by setTimeout 
@@ -63,20 +65,26 @@ class @UniverseTimer
 	
 class @UniverseObject
 	constructor: (params={}) ->
-		@element				= params.element					||	null
-		@mass						= params.mass							||	10
-		@width					= params.width						||	16
-		@height					= params.height						||	16
-		@position				= params.position					||	Universe.create3DVector()
-		@velocity				= params.velocity					||	Universe.create3DVector()
-		@acceleration		= params.acceleration			||	Universe.create3DVector()
+		@element		= params.element		|| null
+		@type			= params.type			|| null
+		@mass			= params.mass			|| null
+		@width			= params.width			|| null
+		@height			= params.height			|| null
+		@position		= params.position		|| Universe.create3DVector()
+		@velocity		= params.velocity		|| Universe.create3DVector()
+		@acceleration	= params.acceleration	|| Universe.create3DVector()
+		@universe		= params.universe		|| null
 		
 		# Private Vars
-		@_scale					= null
-		@_world					= null
+		@_scale	= null
 		
-	belongsToUniverse: ->
-		return @_universe?
+		if @element is null and @type isnt null
+			@element = document.createElement('div')
+			# for now, set a class to the element until automatic styling
+			@element.setAttribute('class', @type)
+			@universe.space.appendChild(@element)
+		
+		@universe.addObject(this)
 	
 	# Apply universe scale to position.
 	useScale: (scale) ->
@@ -86,10 +94,6 @@ class @UniverseObject
 				@position[dimension] = value / @_scale
 		this
 	
-	useWorld: (world) ->
-		@_world = world
-		this
-	
 	x: (x) ->
 		if x?
 			@position.x = x
@@ -97,8 +101,8 @@ class @UniverseObject
 	
 	y: (y) ->
 		if y?
-			@position.y = @_world.clientHeight - y
-		@_world.clientHeight - @position.y
+			@position.y = @universe.space.clientHeight - y
+		@universe.space.clientHeight - @position.y
 	
 	z: (z) ->
 		if z?
