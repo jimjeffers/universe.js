@@ -4,6 +4,7 @@
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 	<title>Universe</title>
 	<link rel="stylesheet" href="style.css" type="text/css">
+	<script src="src/capabilities.js"></script>
 	<script src="src/universe.js"></script>
 </head>
 <body>
@@ -11,7 +12,7 @@
 		<div id="circle-existing" class="circle"></div>
 		<div id="square-existing" class="square"></div>
 	</div>
-	<input type="button" name="start" value="Start" id="start" onclick="test_universe.run()">
+	<input type="button" name="start" value="Start" id="start" onclick="test_universe.start()">
 	<input type="button" name="stop" value="Stop" id="stop" onclick="test_universe.stop()">
 	<input type="button" name="reset" value="Reset" id="reset" onclick="test_universe.reset()">
 	<script>
@@ -24,24 +25,24 @@
 	
 	var new_object = new UniverseObject({
 		type: 'circle',
-		position: {x: 10, y: 40, z: 0},
-		acceleration: {x: 5, y: 5, z: 0},
+		position: {x: 10, y: 10, z: 0},
+		velocity: {x: 5, y: 10, z: 0},
 		universe: test_universe
 	});
 	
-	var circle = new UniverseObject({
-		element: document.getElementById('circle-existing'),
-		position: {x: 50, y: 40, z: 0},
-		velocity: {x: 0, y: 10, z: 0},
-		universe: test_universe
-	});
-	
-	var square = new UniverseObject({
-		element: document.getElementById('square-existing'),
-		position: {x: 40, y: 20, z: 0},
-		velocity: {x: -10, y: 5, z: 0},
-		universe: test_universe
-	});
+  var circle = new UniverseObject({
+   element: document.getElementById('circle-existing'),
+   position: {x: 50, y: 40, z: 0},
+   velocity: {x: 20, y: 10, z: 0},
+   universe: test_universe
+  });
+  
+  var square = new UniverseObject({
+   element: document.getElementById('square-existing'),
+   position: {x: 40, y: 20, z: 0},
+   velocity: {x: -10, y: 5, z: 0},
+   universe: test_universe
+  });
 	</script>
 </body>
 </html>
